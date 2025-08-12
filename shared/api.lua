@@ -66,7 +66,6 @@ else -- SERVER SIDE
         local player = Player(src)
         if player then
             player.state:set('need:'..name, clamped, true)
-            GlobalState['p:'..src..':'..name] = clamped
         end
     end
 

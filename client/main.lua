@@ -12,14 +12,11 @@ RegisterNetEvent('fivem-needs:syncAll', function(defs, values, tick)
     for k,v in pairs(values) do
         needs[k] = v
     end
-end)
-
-CreateThread(function()
-    while true do
-        Wait(1000)
-        for k,_ in pairs(API.Defs) do
-            needs[k] = LocalPlayer.state['need:'..k] or needs[k]
-        end
+    local bag = ('player:%s'):format(GetPlayerServerId(PlayerId()))
+    for k,_ in pairs(defs) do
+        AddStateBagChangeHandler('need:'..k, bag, function(_, _, val)
+            needs[k] = val
+        end)
     end
 end)
 

@@ -43,17 +43,28 @@ RegisterNetEvent('fivem-needs:server:consumeItem', function(item)
     if data.stress then API.SvrAddNeed(src, 'stress', data.stress) end
 
     if data.debuff and type(data.debuff) == 'table' then
+        local state = Player(src).state
         for k,v in pairs(data.debuff) do
             if k ~= 'duration' then
-                GlobalState[('m:%s:%s'):format(src, k)] = v
+                state:set(k, v, true)
             end
         end
         SetTimeout(((data.debuff.duration or 60) * 1000), function()
             for k,_ in pairs(data.debuff) do
                 if k ~= 'duration' then
-                    GlobalState[('m:%s:%s'):format(src, k)] = nil
+                    state:set(k, nil, true)
                 end
             end
         end)
+    end
+end)
+
+CreateThread(function()
+    while true do
+        Wait(60000)
+        local now = os.time()
+        for k,expires in pairs(cooldowns) do
+            if expires <= now then cooldowns[k] = nil end
+        end
     end
 end)
