@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS `needs_status` (
+  `identifier` VARCHAR(64) PRIMARY KEY,
+  `data` LONGTEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
