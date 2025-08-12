@@ -1,8 +1,24 @@
--- ใช้ ox_inventory สำหรับ usable items
-for item, data in pairs(Config.Items) do
-    if exports.ox_inventory:Search('count', item) then
-        exports.ox_inventory:RegisterUsableItem(item, function(dataItem, slot, inventory)
-            TriggerServerEvent('advancedneeds:useItem', item)
-        end)
+local Config = require 'config'
+local Utils = require 'shared/utils'
+
+local hasOxLib = GetResourceState('ox_lib') == 'started'
+
+RegisterNetEvent('fivem-needs:client:useItem', function(item, data)
+    local function finished()
+        TriggerServerEvent('fivem-needs:server:consumeItem', item)
     end
-end
+
+    if hasOxLib and lib and lib.progressBar then
+        lib.progressBar({
+            duration = data.time or 2000,
+            label = ('Using %s'):format(item),
+            useWhileDead = false,
+            canCancel = true,
+        }, finished)
+    else
+        TaskStartScenarioInPlace(PlayerPedId(), data.anim or 'WORLD_HUMAN_STAND_IMPATIENT', 0, true)
+        Wait(data.time or 2000)
+        ClearPedTasks(PlayerPedId())
+        finished()
+    end
+end)
