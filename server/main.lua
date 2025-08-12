@@ -64,14 +64,21 @@ CreateThread(function()
     while true do
         Wait(Config.TickSeconds * 1000)
         for _,id in ipairs(GetPlayers()) do
-            for name,def in pairs(API.Defs) do
+            local state = Player(id).state
+            for _,name in ipairs(needNames) do
+                local def = API.Defs[name]
                 local val = API.SvrGetNeed(id, name) or def.default or Config.MaxValue
                 local decay = def.decay or 0
-                local mul = GlobalState['m:'..id..':'..name..'DecayMul'] or 1.0
+                local mul = state[name..'DecayMul'] or 1.0
                 decay = decay * mul
                 val = val - decay
                 if name == 'stress' then
-                    val = val + (GlobalState['m:'..id..':stressAdd'] or Config.BlizzardMode.stressBaseGain or 0)
+                    local stressAdd = state.stressAdd
+                    if stressAdd then
+                        val = val + stressAdd
+                    elseif Config.BlizzardMode.enabled then
+                        val = val + (Config.BlizzardMode.stressBaseGain or 0)
+                    end
                 end
                 val = Utils.Clamp(val, Config.MinValue, Config.MaxValue)
                 API.SvrSetNeed(id, name, val)

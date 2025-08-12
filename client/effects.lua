@@ -33,3 +33,8 @@ RegisterNetEvent('advancedneeds:effect:sway', function(level)
         StopGameplayCamShaking(true)
     end
 end)
+
+RegisterNetEvent('fivem-needs:damage', function(amount)
+    local ped = PlayerPedId()
+    ApplyDamageToPed(ped, amount or 1, false)
+end)

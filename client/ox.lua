@@ -9,12 +9,14 @@ RegisterNetEvent('fivem-needs:client:useItem', function(item, data)
     end
 
     if hasOxLib and lib and lib.progressBar then
-        lib.progressBar({
+        if lib.progressBar({
             duration = data.time or 2000,
             label = ('Using %s'):format(item),
             useWhileDead = false,
             canCancel = true,
-        }, finished)
+        }) then
+            finished()
+        end
     else
         TaskStartScenarioInPlace(PlayerPedId(), data.anim or 'WORLD_HUMAN_STAND_IMPATIENT', 0, true)
         Wait(data.time or 2000)

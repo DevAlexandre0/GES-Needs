@@ -12,6 +12,17 @@ else
     Utils.Debug('Running standalone mode')
 end
 
+AddEventHandler('onResourceStart', function(res)
+    if Framework.mode ~= 'standalone' then return end
+    if res == 'es_extended' then
+        Framework.mode = 'esx'
+        Utils.Debug('Detected ESX')
+    elseif res == 'qb-core' then
+        Framework.mode = 'qb'
+        Utils.Debug('Detected QBCore')
+    end
+end)
+
 -- Robust identifier resolution across ESX/QB/standalone
 function Framework.GetIdentifier(src)
     -- fallback license
