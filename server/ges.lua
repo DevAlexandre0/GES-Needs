@@ -11,7 +11,10 @@ GES.modules = {
 }
 
 local function setMult(src, key, val)
-    GlobalState['m:'..src..':'..key] = val
+    local state = Player(src).state
+    if state then
+        state:set(key, val, true)
+    end
 end
 
 if GES.modules.temperature and Config.Policy.enableFromTemperature then
@@ -94,15 +97,31 @@ function GES.ApplyBlizzard(src)
     setMult(src, 'energyDecayMul', Config.BlizzardMode.energyDecayMul)
     setMult(src, 'stressAdd', Config.BlizzardMode.stressBaseGain)
 end
-
-return GES
+AddEventHandler('onResourceStart', function(res)
+    if res == 'GES-Temperature' then
+        GES.modules.temperature = true
+    elseif res == 'GES-Wetness' then
+        GES.modules.wetness = true
+    elseif res == 'GES-Stamina' then
+        GES.modules.stamina = true
+    elseif res == 'GES-Injury' then
+        GES.modules.injury = true
+    elseif res == 'GES-Sickness' then
+        GES.modules.sickness = true
+    end
+end)
 
 AddEventHandler('onResourceStop', function(res)
     if res ~= GetCurrentResourceName() then return end
     for _, id in ipairs(GetPlayers()) do
-        GlobalState[('m:%s:thirstDecayMul'):format(id)] = nil
-        GlobalState[('m:%s:hungerDecayMul'):format(id)] = nil
-        GlobalState[('m:%s:energyDecayMul'):format(id)] = nil
-        GlobalState[('m:%s:stressAdd'):format(id)] = nil
+        local state = Player(id).state
+        if state then
+            state:set('thirstDecayMul', nil, true)
+            state:set('hungerDecayMul', nil, true)
+            state:set('energyDecayMul', nil, true)
+            state:set('stressAdd', nil, true)
+        end
     end
 end)
+
+return GES
