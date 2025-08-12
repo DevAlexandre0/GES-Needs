@@ -17,7 +17,6 @@ shared_scripts {
 }
 
 client_scripts {
-    'client/ui.lua',
     'client/effects.lua',
     'client/ox.lua',
     'client/main.lua'

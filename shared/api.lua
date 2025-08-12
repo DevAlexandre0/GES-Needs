@@ -60,11 +60,13 @@ else -- SERVER SIDE
 
     function API.SvrSetNeed(src, name, val)
         local p = API.EnsurePlayer(src)
-        p[name] = Utils.Clamp(val, Config.MinValue, Config.MaxValue)
+        local clamped = Utils.Clamp(val, Config.MinValue, Config.MaxValue)
+        if p[name] == clamped then return end
+        p[name] = clamped
         local player = Player(src)
         if player then
-            player.state:set('need:'..name, p[name], true)
-            GlobalState['p:'..src..':'..name] = p[name]
+            player.state:set('need:'..name, clamped, true)
+            GlobalState['p:'..src..':'..name] = clamped
         end
     end
 
@@ -91,13 +93,19 @@ else -- SERVER SIDE
         players[source] = nil
     end)
 
+    local function validate(name, val)
+        return type(name) == 'string' and type(val) == 'number' and API.Defs[name]
+    end
+
     RegisterNetEvent('fivem-needs:set', function(name, val)
         local src = source
+        if not validate(name, val) then return end
         API.SvrSetNeed(src, name, val)
     end)
 
     RegisterNetEvent('fivem-needs:add', function(name, val)
         local src = source
+        if not validate(name, val) then return end
         API.SvrAddNeed(src, name, val)
     end)
 end

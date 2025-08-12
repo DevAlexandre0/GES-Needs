@@ -46,6 +46,7 @@ AddEventHandler('playerDropped', function()
     local src = source
     local data = API.SvrGetAllNeeds(src)
     if data then Persist.Save(src, data) end
+    thresholds[src] = nil
 end)
 
 CreateThread(function()
