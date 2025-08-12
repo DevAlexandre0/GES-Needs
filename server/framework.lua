@@ -12,29 +12,33 @@ else
     Utils.Debug('Running standalone mode')
 end
 
+-- Robust identifier resolution across ESX/QB/standalone
 function Framework.GetIdentifier(src)
+    -- fallback license
+    local license
+    for _,id in ipairs(GetPlayerIdentifiers(src)) do
+        if id:find('license:') then license = id:sub(9) break end
+    end
     if Framework.mode == 'esx' then
-        local xPlayer = exports['es_extended']:getPlayerFromId(src)
-        return xPlayer and xPlayer.identifier
+        local ESX = rawget(_G, 'ESX') or (exports['es_extended'] and exports['es_extended']:getSharedObject())
+        if ESX and ESX.GetPlayerFromId then
+            local x = ESX.GetPlayerFromId(src)
+            if x and x.identifier then return x.identifier end
+        end
     elseif Framework.mode == 'qb' then
-        local player = exports['qb-core']:GetPlayer(src)
-        return player and player.PlayerData.citizenid
-    else
-        for _,id in ipairs(GetPlayerIdentifiers(src)) do
-            if id:find('license:') then return id end
+        local QBCore = exports['qb-core'] and exports['qb-core']:GetCoreObject()
+        if QBCore and QBCore.Functions and QBCore.Functions.GetPlayer then
+            local p = QBCore.Functions.GetPlayer(src)
+            if p and p.PlayerData and p.PlayerData.citizenid then return p.PlayerData.citizenid end
         end
     end
+    return license or ('src'..src)
 end
 
--- ESX status shims
-if Framework.mode == 'esx' then
-    RegisterNetEvent('esx_status:getStatus', function(name, cb)
-        local src = source
-        cb(exports['fivem-needs']:SvrGetStatus(src, name))
-    end)
-    RegisterNetEvent('esx_basicneeds:healPlayer', function()
-        TriggerEvent('fivem-needs:healPlayer')
-    end)
-end
+-- ESX/QB shims kept minimal. Avoid callback over NetEvent (unsupported).
+-- Provide an export for ESX-style status retrieval.
+exports('esx_getStatus', function(src, name)
+    return exports['fivem-needs']:SvrGetStatus(src, name)
+end)
 
 return Framework

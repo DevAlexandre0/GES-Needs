@@ -96,3 +96,13 @@ function GES.ApplyBlizzard(src)
 end
 
 return GES
+
+AddEventHandler('onResourceStop', function(res)
+    if res ~= GetCurrentResourceName() then return end
+    for _, id in ipairs(GetPlayers()) do
+        GlobalState[('m:%s:thirstDecayMul'):format(id)] = nil
+        GlobalState[('m:%s:hungerDecayMul'):format(id)] = nil
+        GlobalState[('m:%s:energyDecayMul'):format(id)] = nil
+        GlobalState[('m:%s:stressAdd'):format(id)] = nil
+    end
+end)

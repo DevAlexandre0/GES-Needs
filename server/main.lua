@@ -4,8 +4,10 @@ local API = require 'shared/api'
 local Persist = require 'server/persistence'
 local GES = require 'server/ges'
 
+local needNames = {}
 for name,def in pairs(Config.Statuses) do
     API.RegisterNeed(name, def)
+    needNames[#needNames+1] = name
 end
 
 local thresholds = {}
@@ -20,7 +22,16 @@ local function handleThreshold(src, name, value, def)
             states[i] = true
             TriggerClientEvent('advancedneeds:threshold:enter', src, {need=name, level=i, value=value})
             for _,eff in ipairs(rule.effects or {}) do
-                TriggerClientEvent('advancedneeds:effect:'..eff.type, src, eff.value)
+                local t = eff.type
+                if t == 'blackout' then
+                    TriggerClientEvent('advancedneeds:effect:blackout', src, eff.ms or eff.value or 250)
+                elseif t == 'shake' then
+                    TriggerClientEvent('advancedneeds:effect:shake', src, eff.intensity or eff.value or 0.15, eff.duration or 600)
+                elseif t == 'breath' then
+                    TriggerClientEvent('advancedneeds:effect:breath', src, eff.state or 'fast')
+                elseif t == 'sway' then
+                    TriggerClientEvent('advancedneeds:effect:sway', src, eff.level or 'low')
+                end
             end
         elseif not condition and states[i] then
             states[i] = nil
