@@ -1,24 +1,26 @@
 fx_version 'cerulean'
+lua54 'yes'
+
 game 'gta5'
 
-author 'Your Name'
-description 'Advanced Needs System (Standalone + ESX/QB autodetect) - Hardcore Blizzard Mode'
-version '1.0.0'
+name 'fivem-needs'
+description 'Advanced Needs system for hardcore blizzard survival'
 
-lua54 'yes'
+provide 'esx_status'
+provide 'esx_basicneeds'
 
 shared_scripts {
     '@ox_lib/init.lua',
     'config.lua',
     'shared/utils.lua',
-    'locales/en.lua'
+    'shared/api.lua'
 }
 
 client_scripts {
     'client/ui.lua',
     'client/effects.lua',
     'client/ox.lua',
-    'client/main.lua',
+    'client/main.lua'
 }
 
 server_scripts {
@@ -27,28 +29,13 @@ server_scripts {
     'server/persistence.lua',
     'server/ges.lua',
     'server/ox.lua',
-    'server/main.lua',
+    'server/main.lua'
 }
 
 exports {
-    'GetStatus',
-    'GetNeed',
-    'SetNeed',
-    'AddNeed',
-    'RegisterNeed'
+    'GetStatus'
 }
 
 server_exports {
-    'SvrGetStatus',
-    'SvrGetNeed',
-    'SvrSetNeed',
-    'SvrAddNeed',
-    'SvrRegisterNeed'
-}
-
-provide {
-    'esx_status',
-    'esx_basicneeds',
-    'qb-status',
-    'qb-needs'
+    'SvrGetStatus'
 }
